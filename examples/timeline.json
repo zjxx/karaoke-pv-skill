@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "duration": 8,
+  "width": 852,
+  "height": 480,
+  "cues": [
+    {"start": 1.25, "end": 3.5, "ja": "青い空", "romaji": "Aoi sora", "timing_source": "estimated", "note": "Original synthetic example, not transcribed audio."},
+    {"start": 4.2, "end": 6.7, "ja": "風を待つ", "romaji": "Kaze wo matsu", "timing_source": "estimated", "note": "Demonstrates a visible gap; not a measured singing pause."}
+  ]
+}

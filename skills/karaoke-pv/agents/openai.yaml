@@ -1,0 +1,4 @@
+interface:
+  display_name: "Karaoke PV"
+  short_description: "Create romaji PV subtitles with reviewed phrase timing"
+  default_prompt: "Use $karaoke-pv to prepare my PV with readable romaji phrases and check the timing against the vocals."
