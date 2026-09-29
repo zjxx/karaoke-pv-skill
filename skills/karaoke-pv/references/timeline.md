@@ -23,6 +23,13 @@ segment. A crop beginning at 80 seconds needs 80 added to every local word time.
 }
 ```
 
+`romaji` is required. `ja` is optional and may be omitted or an empty string when
+only romaji was provided. Do not invent Japanese spelling to satisfy the schema.
+The default `--display bilingual` emits Japanese where available and always
+romaji. `--display romaji` hides Japanese even when present in the source timeline.
+The agent prepares this JSON from supplied text (Mode A) or reviewed ASR (Mode B);
+these scripts do not automatically align arbitrary raw text or transliterate it.
+
 `timing_source` is `asr`, `estimated`, or `audio-reviewed`. Use `note` to record
 uncertainty or how a boundary was checked. Review flags describe timing, not a
 guarantee that lyrics or readings are correct. The exporter refuses unreviewed
@@ -43,6 +50,7 @@ Examples (from repository root):
 
 ```sh
 python skills/karaoke-pv/scripts/subtitles.py examples/timeline.json --output-dir work/subtitles --draft
+python skills/karaoke-pv/scripts/subtitles.py examples/romaji-only.json --output-dir work/romaji-only --display romaji --draft
 python skills/karaoke-pv/scripts/render.py work/pv.mp4 work/subtitles/romaji.ass work/preview.mp4 --start 80 --duration 25
 python skills/karaoke-pv/scripts/render.py work/pv.mp4 work/subtitles/romaji.ass work/vocal.mp4
 python skills/karaoke-pv/scripts/render.py work/pv.mp4 work/subtitles/romaji.ass work/instrumental.mp4 --audio work/instrumental.wav

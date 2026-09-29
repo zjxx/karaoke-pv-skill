@@ -1,4 +1,4 @@
 interface:
-  display_name: "Karaoke PV"
-  short_description: "Create romaji PV subtitles with reviewed phrase timing"
-  default_prompt: "Use $karaoke-pv to prepare my PV with readable romaji phrases and check the timing against the vocals."
+  display_name: "Romaji Video Subtitles"
+  short_description: "Subtitle Japanese videos from supplied text or audio"
+  default_prompt: "Use $karaoke-pv to add readable romaji subtitles to my local video, using my supplied text or transcribing the audio when no text is available."

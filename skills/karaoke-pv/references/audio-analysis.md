@@ -1,5 +1,11 @@
 # Vocal analysis and alignment
 
+In supplied-text mode, start with the user's Japanese or romaji and use recognition
+only when it helps alignment or resolves a disputed reading. In recognition mode,
+produce a Japanese draft first, then romaji. A plain dialogue clip can use extracted
+audio directly; stem separation is optional for music or difficult background sound.
+When the source is romaji-only, keep Japanese absent instead of guessing kanji.
+
 ## Extract and optionally separate
 
 Use FFmpeg to extract the original audio without moving its timeline:

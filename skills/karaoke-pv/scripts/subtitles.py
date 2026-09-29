@@ -59,8 +59,10 @@ def validate(data, draft=False):
         if ticks(a, 100) >= ticks(b, 100):
             raise ValueError(f'cue {i}: collapses at ASS centisecond precision')
         previous_end = b
-        for key in ('ja', 'romaji'):
-            plain_text(cue.get(key), f'cue {i} {key}')
+        plain_text(cue.get('romaji'), f'cue {i} romaji')
+        # Romaji-only source text does not imply recoverable Japanese spelling.
+        if 'ja' in cue and cue['ja'] != '':
+            plain_text(cue['ja'], f'cue {i} ja')
         source = cue.get('timing_source')
         if source not in ('asr', 'estimated', 'audio-reviewed'):
             raise ValueError(f'cue {i}: missing/invalid timing_source')
@@ -73,8 +75,10 @@ def validate(data, draft=False):
     return warnings
 
 
-def export(data, output_dir, draft=False, jp_font='sans-serif', romaji_font='Arial'):
+def export(data, output_dir, draft=False, jp_font='sans-serif', romaji_font='Arial', display='bilingual'):
     warnings = validate(data, draft)
+    if display not in ('bilingual', 'romaji'):
+        raise ValueError('display must be bilingual or romaji')
     for font in (jp_font, romaji_font):
         plain_text(font, 'font name')
         if ',' in font:
@@ -87,9 +91,13 @@ def export(data, output_dir, draft=False, jp_font='sans-serif', romaji_font='Ari
     jp_size, rom_size = 22 * scale, 21 * scale
     srt, events = [], []
     for i, cue in enumerate(data['cues'], 1):
-        a, b, ja, rom = (cue[k] for k in ('start', 'end', 'ja', 'romaji'))
-        srt.append(f'{i}\n{timestamp(a)} --> {timestamp(b)}\n{ja}\n{rom}\n')
-        for layer, style, text in ((0, 'JP', ja), (1, 'ROMA', rom)):
+        a, b, rom = (cue[k] for k in ('start', 'end', 'romaji'))
+        ja = cue.get('ja', '') if display == 'bilingual' else ''
+        lines = f'{ja}\n{rom}' if ja else rom
+        srt.append(f'{i}\n{timestamp(a)} --> {timestamp(b)}\n{lines}\n')
+        parts = [(0, 'JP', ja)] if ja else []
+        parts.append((1, 'ROMA', rom))
+        for layer, style, text in parts:
             events.append(f'Dialogue: {layer},{timestamp(a, True)},{timestamp(b, True)},{style},,0,0,0,,{text}')
     header = f'''[Script Info]
 Title: Romaji phrases{' - DRAFT' if draft else ''}
@@ -108,7 +116,7 @@ Style: ROMA,{romaji_font},{rom_size:.2f},&H0000FFFF,&H0000FFFF,&H00101010,&H8000
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 '''
     report = {
-        'draft': draft, 'cue_count': len(data['cues']),
+        'draft': draft, 'display': display, 'cue_count': len(data['cues']),
         'unreviewed': [i for i, c in enumerate(data['cues'], 1) if c['timing_source'] != 'audio-reviewed'],
         'warnings': warnings,
         'limitation': 'Schema validation is not audio synchronization or visual verification.'
@@ -127,9 +135,11 @@ def main():
     p.add_argument('--draft', action='store_true', help='Allow asr/estimated timings, recorded in report')
     p.add_argument('--jp-font', default='sans-serif')
     p.add_argument('--romaji-font', default='Arial')
+    p.add_argument('--display', choices=('bilingual', 'romaji'), default='bilingual',
+                   help='Show Japanese where available, or romaji only')
     a = p.parse_args()
     try:
-        report = export(json.loads(a.timeline.read_text(encoding='utf-8-sig')), a.output_dir, a.draft, a.jp_font, a.romaji_font)
+        report = export(json.loads(a.timeline.read_text(encoding='utf-8-sig')), a.output_dir, a.draft, a.jp_font, a.romaji_font, a.display)
     except (ValueError, OSError) as e:
         p.exit(1, f'Error: {e}\n')
     print(json.dumps(report, ensure_ascii=False, indent=2))

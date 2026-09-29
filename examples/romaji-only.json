@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "duration": 8,
+  "width": 852,
+  "height": 480,
+  "cues": [
+    {"start": 1.25, "end": 3.5, "romaji": "Aoi sora", "timing_source": "estimated", "note": "Original synthetic example of romaji-only input; no audio review."},
+    {"start": 4.2, "end": 6.7, "romaji": "Kaze wo matsu", "timing_source": "estimated", "note": "Synthetic gap for layout demonstration, not acoustic silence."}
+  ]
+}
